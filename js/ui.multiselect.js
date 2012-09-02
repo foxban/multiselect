@@ -34,6 +34,7 @@ $.widget("ui.multiselect", {
 		animated: 'fast',
 		show: 'slideDown',
 		hide: 'slideUp',
+		vertical: false,
 		dividerLocation: 0.6,
 		nodeComparator: function(node1,node2) {
 			var text1 = node1.text(),
@@ -47,6 +48,9 @@ $.widget("ui.multiselect", {
 		this.container = $('<div class="ui-multiselect ui-helper-clearfix ui-widget"></div>').insertAfter(this.element);
 		this.count = 0; // number of currently selected options
 		this.selectedContainer = $('<div class="selected"></div>').appendTo(this.container);
+		if( this.options.vertical == 'true' ) {
+			$('<p style="clear:both;"></p>').appendTo(this.container);
+		}
 		this.availableContainer = $('<div class="available"></div>').appendTo(this.container);
 		this.selectedActions = $('<div class="actions ui-widget-header ui-helper-clearfix"><span class="count">0 '+$.ui.multiselect.locale.itemsCount+'</span><a href="#" class="remove-all">'+$.ui.multiselect.locale.removeAll+'</a></div>').appendTo(this.selectedContainer);
 		this.availableActions = $('<div class="actions ui-widget-header ui-helper-clearfix"><input type="text" class="search empty ui-widget-content ui-corner-all"/><a href="#" class="add-all">'+$.ui.multiselect.locale.addAll+'</a></div>').appendTo(this.availableContainer);
@@ -54,15 +58,26 @@ $.widget("ui.multiselect", {
 		this.availableList = $('<ul class="available connected-list"><li class="ui-helper-hidden-accessible"></li></ul>').bind('selectstart', function(){return false;}).appendTo(this.availableContainer);
 		
 		var that = this;
+		
+		if( this.options.vertical == true ) {
+			// set dimensions
+			this.container.width(this.element.width()+1);
+			this.selectedContainer.width(this.element.width());
+			this.availableContainer.width(this.element.width());
 
-		// set dimensions
-		this.container.width(this.element.width()+1);
-		this.selectedContainer.width(Math.floor(this.element.width()*this.options.dividerLocation));
-		this.availableContainer.width(Math.floor(this.element.width()*(1-this.options.dividerLocation)));
+			// fix list height to match <option> depending on their individual header's heights
+			this.selectedList.height(Math.max(this.element.height()-this.selectedActions.height(),1));
+			this.availableList.height(Math.max(this.element.height()-this.availableActions.height(),1));
+		}else{
+			// set dimensions
+			this.container.width(this.element.width()+1);
+			this.selectedContainer.width(Math.floor(this.element.width()*this.options.dividerLocation));
+			this.availableContainer.width(Math.floor(this.element.width()*(1-this.options.dividerLocation)));
 
-		// fix list height to match <option> depending on their individual header's heights
-		this.selectedList.height(Math.max(this.element.height()-this.selectedActions.height(),1));
-		this.availableList.height(Math.max(this.element.height()-this.availableActions.height(),1));
+			// fix list height to match <option> depending on their individual header's heights
+			this.selectedList.height(Math.max(this.element.height()-this.selectedActions.height(),1));
+			this.availableList.height(Math.max(this.element.height()-this.availableActions.height(),1));			
+		}
 		
 		if ( !this.options.animated ) {
 			this.options.show = 'show';
